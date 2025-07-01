@@ -1,0 +1,8 @@
+salon\beaute\demo\models\Prestation.class
+org\example\Main.class
+salon\beaute\demo\models\RendezVous.class
+salon\beaute\demo\utils\CsvUtils.class
+salon\beaute\demo\managers\ServiceManager.class
+salon\beaute\demo\models\Client.class
+salon\beaute\demo\managers\ClientManager.class
+salon\beaute\demo\models\Service.class

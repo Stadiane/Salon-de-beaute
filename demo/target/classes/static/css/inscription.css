@@ -1,0 +1,76 @@
+.signup-container {
+    width: 400px;
+    margin: 80px auto;
+    text-align: center;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.logo {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 80px;
+    height: auto;
+    border-radius: 10px;
+}
+
+h1 {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.formulaire input[type="text"],
+.formulaire input[type="email"],
+.formulaire input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background-color: #eee;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+.checkbox input {
+    margin-right: 8px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ccc;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #bbb;
+}
+
+.login-text {
+    margin-top: 25px;
+    font-size: 13px;
+    color: black;
+}
+
+.login-text a {
+    color: #aa0077;
+    font-weight: bold;
+    text-decoration: none;
+}
