@@ -72,18 +72,16 @@ public class RendezVousManager {
         System.out.println("=== Réservation ===");
         serviceManager.afficherTous();
         System.out.print("Nom du service : ");
-        String nom = scanner.nextLine();
-        Service service = serviceManager.chercherParNom(nom);
-
+        String nomService = scanner.nextLine();
+        Service service = serviceManager.chercherParNom(nomService);
         if (service == null) {
-            System.out.println(" Service introuvable.");
+            System.out.println("Service introuvable.");
             return;
         }
 
-        // AJOUT : choix du prestataire
         System.out.println("Liste des prestataires disponibles :");
         for (Prestataire p : prestataireManager.getPrestataires()) {
-            System.out.println("- " + p.getNom() + " (" + p.getEmail() + ")");
+            p.afficher();
         }
         System.out.print("Email du prestataire : ");
         String emailPrestataire = scanner.nextLine();
@@ -95,28 +93,34 @@ public class RendezVousManager {
 
         System.out.print("Date (YYYY-MM-DD) : ");
         String dateStr = scanner.nextLine();
-
+        LocalDate date;
         try {
-            LocalDate date = LocalDate.parse(dateStr);
-
-            // AJOUT : vérification des conflits pour ce prestataire
-            for (RendezVous rdv : rdvs) {
-                if (rdv.getPrestataire() != null &&
-                        rdv.getPrestataire().getEmail().equals(prestataire.getEmail()) &&
-                        rdv.getDate().equals(date)) {
-                    System.out.println("Ce prestataire a déjà un rendez-vous à cette date !");
-                    return;
-                }
-            }
-
-            RendezVous rdv = new RendezVous(client, service, date, "Prévu", prestataire); // MODIF : ajout prestataire
-            rdvs.add(rdv);
-            sauvegarder();
-            System.out.println(" Rendez-vous enregistré !");
+            date = LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            System.out.println(" Date invalide.");
+            System.out.println("Date invalide.");
+            return;
         }
+
+        // Vérification des conflits
+        for (RendezVous rdv : rdvs) {
+            if (rdv.getPrestataire() != null &&
+                    rdv.getPrestataire().getEmail().equalsIgnoreCase(emailPrestataire) &&
+                    rdv.getDate().equals(date)) {
+                System.out.println("Erreur : Ce prestataire a déjà un rendez-vous à cette date.");
+                System.out.println("Notification : La réservation a échoué car le créneau est déjà pris.");
+                return;
+            }
+        }
+
+
+        RendezVous rdv = new RendezVous(client, service, date, "Prévu", prestataire);
+        rdvs.add(rdv);
+        sauvegarder();
+
+        // Notification de confirmation
+        System.out.println("Notification : Rendez-vous confirmé pour le " + date + " avec " + prestataire.getNom() + ".");
     }
+
 
     public void afficherRendezVousPourClient(Client client) {
         System.out.println("=== Vos Rendez-vous ===");
@@ -137,4 +141,17 @@ public class RendezVousManager {
             }
         }
     }
+    public boolean annulerRendezVous(String id, Client client) {
+        for (RendezVous rdv : rdvs) {
+            if (rdv.getId().equals(id) && rdv.getClient().getEmail().equals(client.getEmail())) {
+                rdvs.remove(rdv);
+                sauvegarder();
+                System.out.println("Notification : Rendez-vous annulé pour le " + rdv.getDate() + " avec " + rdv.getPrestataire().getNom() + ".");
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

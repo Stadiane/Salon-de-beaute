@@ -9,6 +9,8 @@ import salon.beaute.demo.models.RendezVous;
 import salon.beaute.demo.managers.AvisManager;
 import salon.beaute.demo.models.Service;
 import salon.beaute.demo.managers.PrestataireManager;
+import salon.beaute.demo.models.Prestataire;
+// import salon.beaute.demo.models.Prestation;
 
 import java.util.Scanner;
 
@@ -54,6 +56,7 @@ public class Main {
                             System.out.println("\n--- MENU CLIENT CONNECTÉ ---");
                             System.out.println("1. Réserver un rendez-vous");
                             System.out.println("2. Voir mes rendez-vous");
+                            System.out.println("3. Annuler un rendez-vous");
                             System.out.println("0. Retour");
                             System.out.print("Votre choix : ");
                             choixClient = Integer.parseInt(scanner.nextLine());
@@ -80,6 +83,14 @@ public class Main {
                                         }
                                     }
                                 }
+                                case 3 -> {
+                                    rdvManager.afficherRendezVousPourClient(c);
+                                    System.out.print("ID du rendez-vous à annuler : ");
+                                    String id = scanner.nextLine();
+                                    boolean ok = rdvManager.annulerRendezVous(id, c);
+                                    if (ok) System.out.println("Rendez-vous annulé !");
+                                    else System.out.println("Erreur : rendez-vous introuvable ou non annulable.");
+                                }
                                 case 0 -> System.out.println("Retour au menu principal.");
                                 default -> System.out.println("Choix invalide.");
                             }
@@ -93,6 +104,92 @@ public class Main {
             }
             default -> System.out.println("Choix invalide.");
         }
+    }
+
+    public static void menuPrestataire(PrestataireManager prestataireManager, RendezVousManager rdvManager, Scanner scanner) {
+        System.out.println("=== ESPACE PRESTATAIRE ===");
+        System.out.println("1. S'inscrire");
+        System.out.println("2. Se connecter");
+        System.out.print("Votre choix : ");
+        int choix = Integer.parseInt(scanner.nextLine());
+
+        switch (choix) {
+            case 1 -> {
+                System.out.print("Nom : ");
+                String nom = scanner.nextLine();
+                System.out.print("Email : ");
+                String email = scanner.nextLine();
+                System.out.print("Mot de passe : ");
+                String mdp = scanner.nextLine();
+                Prestataire nouveau = new Prestataire(nom, email, mdp);
+                prestataireManager.ajouterPrestataire(nouveau);
+                System.out.println("Inscription prestataire réussie !");
+            }
+            case 2 -> {
+                System.out.print("Email : ");
+                String email = scanner.nextLine();
+                System.out.print("Mot de passe : ");
+                String mdp = scanner.nextLine();
+                Prestataire p = prestataireManager.getPrestataireParEmail(email);
+                if (p != null && p.getMotDePasse().equals(mdp)) {
+                    System.out.println("Bienvenue " + p.getNom() + " !");
+                    rdvManager.afficherRendezVousPourPrestataire(p);
+                } else {
+                    System.out.println("Identifiants incorrects.");
+                }
+            }
+            default -> System.out.println("Choix invalide.");
+        }
+    }
+
+    public static void menuAdmin(PrestataireManager prestataireManager, RendezVousManager rdvManager, ServiceManager serviceManager, Scanner scanner) {
+        System.out.println("=== ESPACE ADMINISTRATEUR ===");
+        int choix;
+        do {
+            System.out.println("1. Lister les prestataires");
+            System.out.println("2. Ajouter un prestataire");
+            System.out.println("3. Supprimer un prestataire");
+            System.out.println("4. Voir tous les rendez-vous");
+            System.out.println("5. Voir les statistiques");
+            System.out.println("0. Retour");
+            System.out.print("Votre choix : ");
+            choix = Integer.parseInt(scanner.nextLine());
+            switch (choix) {
+                case 1 -> {
+                    for (Prestataire p : prestataireManager.getPrestataires()) p.afficher();
+                }
+                case 2 -> {
+                    System.out.print("Nom : ");
+                    String nom = scanner.nextLine();
+                    System.out.print("Email : ");
+                    String email = scanner.nextLine();
+                    System.out.print("Mot de passe : ");
+                    String mdp = scanner.nextLine();
+                    prestataireManager.ajouterPrestataire(new Prestataire(nom, email, mdp));
+                    System.out.println(" Prestataire ajouté !");
+                }
+                case 3 -> {
+                    System.out.print("Email du prestataire à supprimer : ");
+                    String email = scanner.nextLine();
+                    Prestataire aSupprimer = prestataireManager.getPrestataireParEmail(email);
+                    if (aSupprimer != null) {
+                        prestataireManager.getPrestataires().remove(aSupprimer);
+                        System.out.println(" Prestataire supprimé !");
+                    } else {
+                        System.out.println(" Introuvable.");
+                    }
+                }
+                case 4 -> rdvManager.afficherTous();
+                case 5 -> {
+                    System.out.println("Statistiques :");
+                    System.out.println("Nombre de services : " + serviceManager.getAll().size());
+                    System.out.println("Nombre de prestataires : " + prestataireManager.getPrestataires().size());
+                    System.out.println("Nombre de rendez-vous : " + rdvManager.getAll().size());
+                }
+                case 0 -> System.out.println(" Retour au menu principal.");
+                default -> System.out.println(" Choix invalide.");
+            }
+        } while (choix != 0);
     }
 
     public static void main(String[] args) {
@@ -110,6 +207,8 @@ public class Main {
             System.out.println("3. Supprimer un service");
             System.out.println("4. Rechercher un service");
             System.out.println("5. Espace client");
+            System.out.println("6. Espace prestataire");
+            System.out.println("7. Espace administrateur");
             System.out.println("0. Quitter");
             System.out.print("Votre choix : ");
             try {
@@ -157,6 +256,8 @@ public class Main {
                     }
                 }
                 case 5 -> menuClient(clientManager, scanner, rdvManager, manager, avisManager);
+                case 6 -> menuPrestataire(prestataireManager, rdvManager, scanner);
+                case 7 -> menuAdmin(prestataireManager, rdvManager, manager, scanner);
                 case 0 -> System.out.println("Au revoir !");
                 default -> System.out.println("Choix invalide.");
             }
