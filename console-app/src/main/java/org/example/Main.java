@@ -1,5 +1,7 @@
 package org.example;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 
 import salon.beaute.demo.managers.ClientManager;
 import salon.beaute.demo.managers.RendezVousManager;
@@ -152,12 +154,29 @@ public class Main {
                         switch (choix2) {
                             case 1 -> rdvManager.afficherRendezVousPourPrestataire(p);
                             case 2 -> {
-                                System.out.print("Date d'indisponibilité (YYYY-MM-DD) : ");
-                                String dateStr = scanner.nextLine();
-                                LocalDate date = LocalDate.parse(dateStr);
+                                LocalDate date = null;
+                                while (true) {
+                                    System.out.print("Date d'indisponibilité (YYYY-MM-DD) : ");
+                                    String dateStr = scanner.nextLine();
+                                    try {
+                                        date = LocalDate.parse(dateStr);
+                                        if (date.isBefore(LocalDate.now())) {
+                                            System.out.println("Vous ne pouvez pas choisir une date passée. Merci de saisir une date future.");
+                                            continue;
+                                        }
+                                        if (p.getIndisponibilites().contains(date)) {
+                                            System.out.println("Cette date est déjà marquée comme indisponible.");
+                                            continue;
+                                        }
+                                        break; // sortie de la boucle, la date est bonne
+                                    } catch (DateTimeParseException e) {
+                                        System.out.println("Format de date invalide. Merci de saisir la date au format YYYY-MM-DD (ex : 2025-07-03).");
+                                    }
+                                }
                                 p.ajouterIndisponibilite(date);
                                 prestataireManager.sauvegarder();
                                 System.out.println("Indisponibilité ajoutée !");
+
                             }
                             case 0 -> {
                                 System.out.println("Déconnexion prestataire.");
