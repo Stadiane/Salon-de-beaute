@@ -37,6 +37,13 @@ public class Client {
     public String getEmail() {
         return email;
     }
+    private String tel;
+
+    public String getTel() {
+        return telephone;
+    }
+
+
 
     public void setEmail(String email) {
         this.email = email;

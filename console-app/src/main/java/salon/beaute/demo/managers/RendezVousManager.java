@@ -1,4 +1,5 @@
 package salon.beaute.demo.managers;
+import java.time.LocalDate;
 
 import salon.beaute.demo.models.Client;
 import salon.beaute.demo.models.RendezVous;
@@ -54,7 +55,7 @@ public class RendezVousManager {
         }
     }
 
-    private void sauvegarder() {
+    public void sauvegarder() {
         File f = new File(FILE_PATH);
         f.getParentFile().mkdirs();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
@@ -79,10 +80,6 @@ public class RendezVousManager {
             return;
         }
 
-        System.out.println("Liste des prestataires disponibles :");
-        for (Prestataire p : prestataireManager.getPrestataires()) {
-            p.afficher();
-        }
         System.out.print("Email du prestataire : ");
         String emailPrestataire = scanner.nextLine();
         Prestataire prestataire = prestataireManager.getPrestataireParEmail(emailPrestataire);
@@ -99,6 +96,12 @@ public class RendezVousManager {
         } catch (DateTimeParseException e) {
             System.out.println("Date invalide.");
             return;
+        }
+        System.out.println("Liste des prestataires disponibles :");
+        for (Prestataire p : prestataireManager.getPrestataires()) {
+            if (!p.getIndisponibilites().contains(date)) {
+                p.afficher();
+            }
         }
 
         // Vérification des conflits
@@ -119,8 +122,82 @@ public class RendezVousManager {
 
         // Notification de confirmation
         System.out.println("Notification : Rendez-vous confirmé pour le " + date + " avec " + prestataire.getNom() + ".");
-    }
+        System.out.println("Email envoyé à " + client.getEmail() + " : confirmation de votre rendez-vous.");
+        System.out.println("SMS envoyé au " + client.getTel() + " : confirmation de votre rendez-vous.");
 
+    }
+    public void modifierRendezVous(String id, Client client, Scanner scanner) {
+        for (RendezVous rdv : rdvs) {
+            if (rdv.getId().equals(id) && rdv.getClient().getEmail().equals(client.getEmail())) {
+                System.out.println("Que souhaitez-vous modifier ?");
+                System.out.println("1. Date");
+                System.out.println("2. Service");
+                System.out.println("3. Prestataire");
+                System.out.print("Votre choix : ");
+                int choix = Integer.parseInt(scanner.nextLine());
+                switch (choix) {
+                    case 1 -> {
+                        System.out.print("Nouvelle date (YYYY-MM-DD) : ");
+                        String dateStr = scanner.nextLine();
+                        LocalDate newDate;
+                        try {
+                            newDate = LocalDate.parse(dateStr);
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Date invalide.");
+                            return;
+                        }
+                        // Conflit ?
+                        for (RendezVous r : rdvs) {
+                            if (r != rdv && r.getPrestataire().getEmail().equals(rdv.getPrestataire().getEmail()) && r.getDate().equals(newDate)) {
+                                System.out.println("Conflit : ce prestataire est déjà réservé à cette date.");
+                                return;
+                            }
+                        }
+                        rdv.setDate(newDate);
+                    }
+                    case 2 -> {
+                        serviceManager.afficherTous();
+                        System.out.print("Nouveau service : ");
+                        String nomService = scanner.nextLine();
+                        Service newService = serviceManager.chercherParNom(nomService);
+                        if (newService == null) {
+                            System.out.println("Service introuvable.");
+                            return;
+                        }
+                        rdv.setService(newService);
+                    }
+                    case 3 -> {
+                        for (Prestataire p : prestataireManager.getPrestataires()) p.afficher();
+                        System.out.print("Email du nouveau prestataire : ");
+                        String emailPrestataire = scanner.nextLine();
+                        Prestataire newPrestataire = prestataireManager.getPrestataireParEmail(emailPrestataire);
+                        if (newPrestataire == null) {
+                            System.out.println("Prestataire introuvable.");
+                            return;
+                        }
+                        // Conflit ?
+                        for (RendezVous r : rdvs) {
+                            if (r != rdv && r.getPrestataire().getEmail().equals(newPrestataire.getEmail()) && r.getDate().equals(rdv.getDate())) {
+                                System.out.println("Conflit : ce prestataire est déjà réservé à cette date.");
+                                return;
+                            }
+                        }
+                        rdv.setPrestataire(newPrestataire);
+                    }
+                    default -> System.out.println("Choix invalide.");
+                }
+                sauvegarder();
+                System.out.println("Notification : Rendez-vous modifié avec succès.");
+                // Notification simulée mail
+                System.out.println("Notification : Rendez-vous modifié avec succès.");
+                System.out.println("Email envoyé à " + client.getEmail() + " : modification de votre rendez-vous.");
+                System.out.println("SMS envoyé au " + client.getTel() + " : modification de votre rendez-vous.");
+
+                return;
+            }
+        }
+        System.out.println("Aucun rendez-vous trouvé avec cet ID.");
+    }
 
     public void afficherRendezVousPourClient(Client client) {
         System.out.println("=== Vos Rendez-vous ===");
@@ -146,7 +223,11 @@ public class RendezVousManager {
             if (rdv.getId().equals(id) && rdv.getClient().getEmail().equals(client.getEmail())) {
                 rdvs.remove(rdv);
                 sauvegarder();
-                System.out.println("Notification : Rendez-vous annulé pour le " + rdv.getDate() + " avec " + rdv.getPrestataire().getNom() + ".");
+                // Notification de confirmation
+                System.out.println("Notification : Rendez-vous annulé.");
+                System.out.println("Email envoyé à " + client.getEmail() + " : annulation de votre rendez-vous.");
+                System.out.println("SMS envoyé au " + client.getTel() + " : annulation de votre rendez-vous.");
+
                 return true;
             }
         }

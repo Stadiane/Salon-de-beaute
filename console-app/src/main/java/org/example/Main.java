@@ -1,4 +1,5 @@
 package org.example;
+import java.time.LocalDate;
 
 import salon.beaute.demo.managers.ClientManager;
 import salon.beaute.demo.managers.RendezVousManager;
@@ -85,12 +86,20 @@ public class Main {
                                 }
                                 case 3 -> {
                                     rdvManager.afficherRendezVousPourClient(c);
+                                    System.out.println("4. Modifier un rendez-vous");
                                     System.out.print("ID du rendez-vous à annuler : ");
                                     String id = scanner.nextLine();
                                     boolean ok = rdvManager.annulerRendezVous(id, c);
                                     if (ok) System.out.println("Rendez-vous annulé !");
                                     else System.out.println("Erreur : rendez-vous introuvable ou non annulable.");
                                 }
+                                case 4 -> {
+                                    rdvManager.afficherRendezVousPourClient(c);
+                                    System.out.print("ID du rendez-vous à modifier : ");
+                                    String id = scanner.nextLine();
+                                    rdvManager.modifierRendezVous(id, c, scanner);
+                                }
+
                                 case 0 -> System.out.println("Retour au menu principal.");
                                 default -> System.out.println("Choix invalide.");
                             }
@@ -133,7 +142,30 @@ public class Main {
                 Prestataire p = prestataireManager.getPrestataireParEmail(email);
                 if (p != null && p.getMotDePasse().equals(mdp)) {
                     System.out.println("Bienvenue " + p.getNom() + " !");
-                    rdvManager.afficherRendezVousPourPrestataire(p);
+                    boolean continuer = true;
+                    while (continuer) {
+                        System.out.println("1. Voir mes rendez-vous");
+                        System.out.println("2. Ajouter une indisponibilité");
+                        System.out.println("0. Déconnexion");
+                        System.out.print("Votre choix : ");
+                        int choix2 = Integer.parseInt(scanner.nextLine());
+                        switch (choix2) {
+                            case 1 -> rdvManager.afficherRendezVousPourPrestataire(p);
+                            case 2 -> {
+                                System.out.print("Date d'indisponibilité (YYYY-MM-DD) : ");
+                                String dateStr = scanner.nextLine();
+                                LocalDate date = LocalDate.parse(dateStr);
+                                p.ajouterIndisponibilite(date);
+                                prestataireManager.sauvegarder();
+                                System.out.println("Indisponibilité ajoutée !");
+                            }
+                            case 0 -> {
+                                System.out.println("Déconnexion prestataire.");
+                                continuer = false;
+                            }
+                            default -> System.out.println("Choix invalide.");
+                        }
+                    }
                 } else {
                     System.out.println("Identifiants incorrects.");
                 }
@@ -141,6 +173,7 @@ public class Main {
             default -> System.out.println("Choix invalide.");
         }
     }
+
 
     public static void menuAdmin(PrestataireManager prestataireManager, RendezVousManager rdvManager, ServiceManager serviceManager, Scanner scanner) {
         System.out.println("=== ESPACE ADMINISTRATEUR ===");

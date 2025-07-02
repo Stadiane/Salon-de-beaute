@@ -30,7 +30,7 @@ public class PrestataireManager {
         sauvegarder();
     }
 
-    private void sauvegarder() {
+    public void sauvegarder() {
         File file = new File(FILE_PATH);
         file.getParentFile().mkdirs();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {

@@ -1,5 +1,7 @@
 package salon.beaute.demo.models;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 public class Prestataire {
     private String nom;
     private String email;
@@ -27,4 +29,8 @@ public class Prestataire {
     public void afficher() {
         System.out.println("Prestataire: " + nom + ", Email: " + email);
     }
+    private List<LocalDate> indisponibilites = new ArrayList<>();
+    public List<LocalDate> getIndisponibilites() { return indisponibilites; }
+    public void ajouterIndisponibilite(LocalDate date) { indisponibilites.add(date); }
+
 }
