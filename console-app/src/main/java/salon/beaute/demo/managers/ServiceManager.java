@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ServiceManager {
 
-    private static final String FILE_PATH = "data/services.csv";
+    private static final String FILE_PATH = "src/data/services.csv";
     private List<Service> services;
 
     public ServiceManager() {
@@ -29,6 +29,8 @@ public class ServiceManager {
     }
 
     private void sauvegarderVersCSV() {
+        File file = new File(FILE_PATH);
+        file.getParentFile().mkdirs();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Service s : services) {
                 writer.write(s.toCSV());
@@ -37,7 +39,9 @@ public class ServiceManager {
         } catch (IOException e) {
             System.out.println("Erreur lors de l'écriture du fichier : " + e.getMessage());
         }
+        System.out.println(" Enregistrement des services dans le fichier CSV...");
     }
+
 
     public List<Service> getAll() {
         return services;

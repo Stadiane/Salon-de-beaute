@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Création de compte</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/inscription.css}">
+</head>
+<body>
+<div class="signup-container">
+    <img src="/images/logo.png" alt="Logo" class="logo">
+
+    <h1>Création de compte</h1>
+
+    <form th:action="@{/client/inscription}" th:object="${client}" method="post" class="formulaire">
+        <input type="text" th:field="*{nom}" placeholder="Nom" required>
+        <input type="email" th:field="*{email}" placeholder="Email" required>
+        <input type="text" th:field="*{telephone}" placeholder="Mobile" required>
+        <input type="password" th:field="*{motDePasse}" placeholder="Mot de passe" required>
+
+        <label class="checkbox">
+            <input type="checkbox" required>
+            J'accepte les conditions
+        </label>
+
+        <button type="submit">Créer</button>
+    </form>
+
+    <p class="login-text">Déjà un compte ?
+        <a th:href="@{/connexion}">Connexion</a>
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'accueil</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/accueil.css}">
+</head>
+<body>
+<div class="container">
+    <!-- Logo -->
+    <img src="/images/logo.png" alt="Logo" class="logo">
+
+    <a th:href="@{/client/inscription}">Créer un compte</a>
+
+    <!-- Image de fond avec contenu centré -->
+    <div class="background">
+        <div class="overlay">
+            <h1>Trouve un salon de beauté près de chez toi</h1>
+            <a th:href="@{/services}" class="btn">Suivant</a>
+            <p class="slogan">Votre salon de beauté à bas prix</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
